@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+  
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ciudades del Mundo</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<style>
+  h1,h2,ul,li{
+      text-align: center;
+      justify-content: center;
+  }
+  body {
+  font-family: "Lato", sans-serif;
+}
+
+.sidebar {
+  height: 100%;
+  width: 0;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  background-color: #111;
+  overflow-x: hidden;
+  transition: 0.5s;
+  padding-top: 60px;
+}
+
+.sidebar a {
+  padding: 8px 8px 8px 32px;
+  text-decoration: none;
+  font-size: 25px;
+  color: #b81717;
+  display: block;
+  transition: 0.3s;
+  
+}
+
+.sidebar a:hover {
+  color: #f1f1f1;
+}
+
+.sidebar .closebtn {
+  position: absolute;
+  top: 0;
+  right: 25px;
+  font-size: 36px;
+  margin-left: 50px;
+}
+
+.openbtn {
+  font-size: 20px;
+  cursor: pointer;
+  background-color: #111;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+}
+
+.openbtn:hover {
+  background-color: #444;
+}
+
+#main {
+  transition: margin-left .5s;
+  padding: 16px;
+}
+
+/* On smaller screens, where height is less than 450px, change the style of the sidenav (less padding and a smaller font size) */
+@media screen and (max-height: 450px) {
+  .sidebar {padding-top: 15px;}
+  .sidebar a {font-size: 18px;}
+}
+
+#mySidebar >p{
+color: #b81717;
+}
+#mySidebar >h2,ul,li{
+color: #b81717;
+}
+  
+</style>
+<body>
+  <h1 id ="inicio">Compra de animales</h1>
+
+  
+
+  <div id="app">
+   
+    <div class="pagination">
+      <button @click="prevPage" :disabled="currentPage === 1">Anterior</button>
+      <span>Página {{ currentPage }} de {{ totalPages }}</span>
+      <button @click="nextPage" :disabled="currentPage === totalPages">Siguiente</button>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.js"></script>
+  <script src="app.js"></script>
+  <script>
+    function openNav() {
+      document.getElementById("mySidebar").style.width = "250px";
+      document.getElementById("main").style.marginLeft = "250px";
+    }
+    
+    function closeNav() {
+      document.getElementById("mySidebar").style.width = "0";
+      document.getElementById("main").style.marginLeft= "0";
+    }
+
+    const { createApp } = Vue;
+const App = {
+  data() {
+    return {
+      valor: 0
+    };
+  },
+}
+
+createApp({
+  template: `
+
+
+  <div id="main">
+    <button class="openbtn" onclick="openNav()">☰ Ver Carrito</button>  
+
+  </div>
+
+  
+      <div class="row">
+      <div v-for="ciudad in paginatedCities" :key=ciudad.id class="col-4">
+          <div class="col-md-4">
+              <div class="card" style="width: 18rem;">
+                  <div class="card-header">
+                      {{ciudad.pais}}
+                  </div>
+                  <div class="card-body">
+                      <h5 class="card-title">{{ciudad.ciudad}}</h5>
+                      <p class="card-text"><img :src="ciudad.imagen" height="100px"></p>
+                        
+                        
+                        <br>
+                        <input type="number" v-model="ciudad.cantidad" min="1" placeholder="Cantidad" /> 
+                        
+                        <br>
+                      <button @click="addToCart(ciudad)">Añadir al carrito</button>
+                  </div>
+                  <div class="card-footer text-muted">
+                       Precio: {{ciudad.precio}} €
+                  </div>
+              </div>
+          </div>
+        </div>
+
+
+      <div class="pagination">
+        <button @click="prevPage" :disabled="currentPage === 1">Anterior</button>
+        <span>Página {{ currentPage }} de {{ totalPages }}</span>
+        <button @click="nextPage" :disabled="currentPage === totalPages">Siguiente</button>
+      </div>
+      
+  </div>
+  <div id="mySidebar" class="sidebar">
+    <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
+    
+
+        <h2>Carrito</h2>
+          <ul v-if="cart.length > 0">
+            <li v-for="item in cart" :key="item.id" class="cart-item">
+              {{ item.ciudad }} - Cantidad: {{ item.cantidad }} - Total: {{ (item.cantidad * item.precio).toFixed(2) }} €
+            </li>
+          </ul>
+        <p v-else>El carrito está vacío</p>
+        <p v-if="totalPrice > 0">Total del carrito: {{ totalPrice.toFixed(2) }} €</p>
+
+        <h3>Convertir a:</h3>
+          <select v-model="selectedCurrency" @change="convertCurrency">
+            <option value="USD">USD</option>
+            <option value="GBP">GBP</option>
+            <option value="JPY">JPY</option>
+            <option value="CAD">CAD</option>
+          </select>
+
+          <p v-if="convertedPrice > 0">Total en {{ selectedCurrency }}: {{ convertedPrice.toFixed(2) }}</p>
+      </div>
+
+      
+  
+  
+
+  </div>
+  `,
+
+  data() {
+    return {
+      cities: [
+        { id: 1, ciudad: "Tokio", habitantes: 13929286, pais: "Japón", continente: "Asia", imagen: "imgC/tokio.webp", deporte:"Sumo", imagenB: "imgB/japon.webp", moneda:"Yenes", precio: 115, cantidad:1},
+        { id: 2, ciudad: "Whasington DC", habitantes: 716269, pais: "Estados Unidos", continente: "América", imagen: "imgC/nuevaYork.webp",deporte:"Fútbol Americano", imagenB: "imgB/eeuu.webp", moneda:"Dólar estadounidense",precio: 115, cantidad:1 },
+        { id: 3, ciudad: "París", habitantes: 2140526, pais: "Francia", continente: "Europa", imagen: "imgC/paris.webp", deporte:"Fútbol", imagenB: "imgB/francia.webp" , moneda:"Euro",precio: 175, cantidad:1},
+        { id: 4, ciudad: "Londres", habitantes: 8982000, pais: "Reino Unido", continente: "Europa", imagen: "imgC/inglesa.webp", deporte:"Fútbol", imagenB: "imgB/reinoUnido.webp", moneda:"Libra esterlina",precio: 215, cantidad:1 },
+        { id: 5, ciudad: "Sídney", habitantes: 5230330, pais: "Australia", continente: "Oceanía", imagen: "imgC/autralia.webp", deporte:"Footy", imagenB: "imgB/australia.webp", moneda:"Dólar australiano",precio: 85, cantidad:1 },
+        { id: 6, ciudad: "Ciudad del Cabo", habitantes: 433688, pais: "Sudáfrica", continente: "África", imagen: "imgC/sudafrica.webp", deporte:"Rugby", imagenB: "imgB/sudafrica.webp", moneda:"Rand",precio: 1135, cantidad:1 },
+        { id: 7, ciudad: "Buenos Aires", habitantes: 3075646, pais: "Argentina", continente: "América", imagen: "imgC/argentina.webp", deporte:"Fútbol", imagenB: "imgB/argentina.webp", moneda:"Peso argentino" ,precio: 45, cantidad:1},
+        { id: 8, ciudad: "Bangkok", habitantes: 10539000, pais: "Tailandia", continente: "Asia", imagen: "imgC/bankok.webp", deporte:"Muay Tai", imagenB: "imgB/tailandia.webp", moneda:"Baht",precio: 65, cantidad:1 },
+        { id: 9, ciudad: "Moscú", habitantes: 12635466, pais: "Rusia", continente: "Europa", imagen: "imgC/rusia.webp", deporte:"Baloncesto", imagenB: "imgB/rusia.webp", moneda:"Rublo",precio: 345, cantidad:1 },
+        { id: 10, ciudad: "Estambul", habitantes: 15462452, pais: "Turquía", continente: "Europa", imagen: "imgC/turquia.webp", deporte:"Yağlı güreş", imagenB: "imgB/turquia.webp", moneda:"Lira turca",precio: 765 , cantidad:1},
+        { id: 11, ciudad: "Ottawa", habitantes: 2348785, pais: "Canadá", continente: "América", imagen: "imgC/canada.webp", deporte:"Hockey", imagenB: "imgB/canada.webp", moneda:"Dólar canadiense" ,precio: 995, cantidad:1},
+        { id: 12, ciudad: "Dubái", habitantes: 3331400, pais: "Emiratos Árabes Unidos", continente: "Asia", imagen: "imgC/arabe.webp", deporte:"Carrera de camellos", imagenB: "imgB/emiratos.webp", moneda:"Dírham",precio: 5 , cantidad:1},
+        { id: 13, ciudad: "Hong Kong", habitantes: 7481800, pais: "China", continente: "Asia", imagen: "imgC/hongKong.webp", deporte:"Ping Pong", imagenB: "imgB/hongKong.webp", moneda:"Dólar Hongkonés" ,precio: 515, cantidad:1},
+        { id: 14, ciudad: "Madrid", habitantes: 3265038, pais: "España", continente: "Europa", imagen: "imgC/españa.webp", deporte:"Fútbol", imagenB: "imgB/españa.webp", moneda:"Euro" ,precio: 65, cantidad:1},
+        { id: 15, ciudad: "Roma", habitantes: 2870500, pais: "Italia", continente: "Europa", imagen: "imgC/italia.webp", deporte:"Fútbol" , imagenB: "imgB/italia.webp", moneda:"Euro",precio: 65, cantidad:1},
+        
+      ],
+      cart: [],
+      currentPage: 1,
+      itemsPerPage: 6,  
+    };
+  },
+  
+
+  computed: {
+      totalPrice() {
+        return this.cart.reduce((sum, item) => sum + item.precio * item.cantidad, 0);
+      },
+    totalPages() {   
+      return Math.ceil(this.cities.length / this.itemsPerPage);
+    },
+    paginatedCities() {
+      const start = (this.currentPage - 1) * this.itemsPerPage;
+      const end = start + this.itemsPerPage;
+      return this.cities.slice(start, end);
+    },
+  },
+  methods: {
+    nextPage() {
+      if (this.currentPage < this.totalPages) this.currentPage++;
+    },
+    prevPage() {
+      if (this.currentPage > 1) this.currentPage--;
+    },
+    addToCart(ciudad) {
+      const existingItem = this.cart.find((item) => item.id === ciudad.id);
+      if (existingItem) {
+        existingItem.cantidad += 1;
+      } else {
+        this.cart.push({ ...ciudad, cantidad: ciudad.cantidad });
+      }
+    },
+    async fetchExchangeRates() {
+          const apiKey = '51abb7a628d50b8ffec13d7a';
+          const url = `https://v6.exchangerate-api.com/v6/${apiKey}/latest/EUR`;
+          const response = await fetch(url);
+          const data = await response.json();
+          this.exchangeRates = data.conversion_rates;
+        },
+        convertCurrency() {
+          if (this.selectedCurrency === 'EUR') {
+            this.convertedPrice = this.totalPrice;
+          } else {
+            const rate = this.exchangeRates[this.selectedCurrency];
+            this.convertedPrice = rate ? this.totalPrice * rate : 0;
+          }
+        }
+      },
+      mounted() {
+        this.fetchExchangeRates();
+      }
+}).mount('#app');
+
+    </script>
+
+    
+  </div>
+
+</body>
+</html>
